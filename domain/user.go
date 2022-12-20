@@ -11,7 +11,7 @@ type (
 		UpdateUser(User) (User, error)
 		ReplaceUser(User) (User, error)
 	}
-	warning struct{
+	Warning struct{
 		Reason		   string		`json:"reason"`
 		Date		   time.Time	`json:"date"`
 	}
@@ -21,7 +21,7 @@ type (
 		Points         int64		`json:"points"`
 		ShowLevel      bool			`json:"show_level"`
 		Warnings       int64		`json:"warnings"`
-		WarningsRecord []warning	`json:"warnings_record"`
+		WarningsRecord []Warning	`json:"warnings_record"`
 		Beta           bool			`json:"beta"`
 		Tickets        int64		`json:"tickets"`
 	}
