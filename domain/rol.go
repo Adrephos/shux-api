@@ -3,10 +3,10 @@ package domain
 type (
 	RolRepository interface {
 		ListRoles() ([]Rol, error)
-		FindRoles(string) (Rol, error)
-		DeleteRol(string) (Rol, error)
-		UpdateRol(Rol) (Rol, error)
-		ReplaceRol(Rol) (Rol, error)
+		GetRoleById(id string) error
+		DeleteRol(id string) error
+		UpdateRol(r *Rol) error
+		ReplaceRol(r *Rol) error
 	}
 	Rol struct {
 		RolId		string		`json:"id"`

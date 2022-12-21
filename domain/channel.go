@@ -3,10 +3,10 @@ package domain
 type (
 	ChannelRepository interface {
 		ListChannels() ([]Channel, error)
-		FindChannel(string) (Channel, error)
-		DeleteChannel(string) (Channel, error)
-		UpdateChannel(Channel) (Channel, error)
-		ReplaceChannel(Channel) (Channel, error)
+		GetChannelById(id string) (Channel, error)
+		DeleteChannel(id string) (Channel, error)
+		UpdateChannel(c *Channel) error
+		ReplaceChannel(c *Channel) error
 	}
 	Channel struct {
 		ChannelId	   string		`json:"id"`

@@ -6,10 +6,10 @@ import (
 
 type (
 	UserRepository interface {
-		FindUser(string) (User, error)
-		DeleteUser(string) (User, error)
-		UpdateUser(User) (User, error)
-		ReplaceUser(User) (User, error)
+		GetById(id string) (User, error)
+		DeleteUser(id string) error
+		UpdateUser(u *User) error
+		ReplaceUser(u *User) error
 	}
 	Warning struct{
 		Reason		   string		`json:"reason"`
