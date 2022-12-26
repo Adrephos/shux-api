@@ -9,7 +9,7 @@ type (
 		ReplaceChannel(c *Channel) error
 	}
 	Channel struct {
-		ChannelId	   string		`json:"id"`
-		Flags		   int64		`json:"flags"`
+		ChannelId	   string		`json:"channel_id" firestore:"-"`
+		Flags		   int64		`json:"flags" firestore:"flags"`
 	}
 )

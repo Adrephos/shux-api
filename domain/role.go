@@ -9,8 +9,8 @@ type (
 		ReplaceRole(r *Role) error
 	}
 	Role struct {
-		RoleId		string		`json:"id"`
-		Name		string		`json:"name"`
-		Flags		int64		`json:"flags"`
+		RoleId		string		`json:"role_id" firestore:"-"`
+		Name		string		`json:"name" firestore:"name"`
+		Flags		int64		`json:"flags" firestore:"flags"`
 	}
 )

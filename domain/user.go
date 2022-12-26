@@ -16,13 +16,12 @@ type (
 		Date		   time.Time	`json:"date"`
 	}
 	User struct {
-		UserId         string		`json:"id"`
-		Description    string		`json:"description"`
-		Points         int64		`json:"points"`
-		ShowLevel      bool			`json:"show_level"`
-		Warnings       int64		`json:"warnings"`
-		WarningsRecord []Warning	`json:"warnings_record"`
-		Beta           bool			`json:"beta"`
-		Tickets        int64		`json:"tickets"`
+		UserId         string		`json:"user_id" firestore:"-"`
+		Description    string		`json:"description" firestore:"description"`
+		Points         int64		`json:"points" firestore:"points"`
+		Warnings       int64		`json:"warnings" firestore:"warnings"`
+		WarningsRecord []Warning	`json:"warnings_record" firestore:"warnings_record"`
+		Tickets        int64		`json:"tickets" firestore:"tickets"`
+		Flags		   int64		`json:"flags" firestore:"flags"`
 	}
 )
