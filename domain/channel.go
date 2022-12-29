@@ -7,9 +7,10 @@ type (
 		DeleteChannel(id string) (Channel, error)
 		UpdateChannel(c *Channel) error
 		ReplaceChannel(c *Channel) error
+		CreateChannel(c *Channel) error
 	}
 	Channel struct {
-		ChannelId	   string		`json:"channel_id" firestore:"-"`
-		Flags		   int64		`json:"flags" firestore:"flags"`
+		ChannelId	   string		`json:"channel_id,omitempty" firestore:"-"`
+		Flags		   int64		`json:"flags,omitempty" firestore:"flags,omitempty"`
 	}
 )
