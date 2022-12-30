@@ -6,11 +6,11 @@ import (
 
 type (
 	UserRepository interface {
-		GetById(UserId string, ServerId string) (User, error)
-		DeleteUser(UserId string, ServerId string) error
-		UpdateUser(u *User, ServerId string) error
-		ReplaceUser(u *User, ServerId string) error
-		CreateUser(u *User, ServerId string) error
+		Get(UserId string, ServerId string) (User, error)
+		Delete(UserId string, ServerId string) error
+		Update(u *User, ServerId string) error
+		Replace(u *User, ServerId string) error
+		Create(u *User, ServerId string) error
 	}
 	Warning struct{
 		Reason		   string		`json:"reason"`
