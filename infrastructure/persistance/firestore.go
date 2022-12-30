@@ -49,8 +49,6 @@ func Get(path string) (map[string]interface{}, error) {
 	id := fmt.Sprintf("%v_id", docParent)
 	data[id] = doc.Ref.ID
 
-	fmt.Println("Found document with id:", doc.Ref.ID)
-
 	return data, err
 }
 
@@ -63,7 +61,6 @@ func Delete(path string, id string) error {
 		return err
 	}
 
-	fmt.Println("Deleted document with ID:", docRef.ID)
 	return nil
 }
 
@@ -75,7 +72,7 @@ func Create(path string, data interface{}, id string) error{
 		fmt.Println(err)
         return err
     }
-    fmt.Println("Created document with ID:", docRef.ID)
+
     return nil
 }
 
@@ -99,6 +96,6 @@ func Update(path string, data interface{}, id string) error{
 		fmt.Println(err)
         return err
     }
-    fmt.Println("Updated document with ID:", docRef.ID)
+
     return nil
 }
