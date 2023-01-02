@@ -12,7 +12,7 @@ type FirestoreUserRepository struct {
 	Client *firestore.Client
 }
 
-func (t *FirestoreUserRepository) GetById(UserId string, ServerId string) (domain.User, error){
+func (t *FirestoreUserRepository) Get(UserId string, ServerId string) (domain.User, error){
 	path := fmt.Sprintf("servers/%s/users/%s", ServerId, UserId)
 	userMap, err := persistance.Get(path)
 
@@ -32,7 +32,7 @@ func (t *FirestoreUserRepository) GetById(UserId string, ServerId string) (domai
 	return u, err
 }
 
-func (t *FirestoreUserRepository) DeleteUser(UserId string, ServerId string) error {
+func (t *FirestoreUserRepository) Delete(UserId string, ServerId string) error {
 	path := fmt.Sprintf("servers/%s/users", ServerId)
 	err := persistance.Delete(path, UserId)
 	if err != nil{
@@ -40,13 +40,30 @@ func (t *FirestoreUserRepository) DeleteUser(UserId string, ServerId string) err
 	}
 	return nil
 }
-func (t *FirestoreUserRepository) UpdateUser(u *domain.User, ServerId string) error {
+func (t *FirestoreUserRepository) Update(u *domain.User, ServerId string) error {
 	path := fmt.Sprintf("servers/%s/users", ServerId)
-	err := persistance.Update(path, *u, *&u.UserId)
+	err := persistance.Update(path, *u, u.UserId)
+
 	return err
 
 }
-//func (t *FirestoreUserRepository) GetById(UserId string, ServerId string) (User, error){}
 
+func (t *FirestoreUserRepository) Replace(u *domain.User, ServerId string) error {
+	path := fmt.Sprintf("servers/%s/users", ServerId)
+	err := persistance.Update(path, *u, u.UserId)
+	
+	return err
 
+}
 
+func (t *FirestoreUserRepository) Create(u *domain.User, ServerId string) error {
+	path := fmt.Sprintf("servers/%s/users", ServerId)
+	err := persistance.Create(path, *u, u.UserId)
+
+	return err
+}
+
+// Instantiates a new user repository
+func NewFirestoreUserRepo(client *firestore.Client) *FirestoreUserRepository {
+	return &FirestoreUserRepository{Client: client}
+}
