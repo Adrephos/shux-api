@@ -45,8 +45,7 @@ func Get(path string) (map[string]interface{}, error) {
 	}
 
 	data = doc.Data()
-	docParent := doc.Ref.Parent.ID[:len(doc.Ref.Parent.ID)-1]
-	id := fmt.Sprintf("%v_id", docParent)
+	id := "id"
 	data[id] = doc.Ref.ID
 
 	return data, err
