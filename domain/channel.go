@@ -2,15 +2,15 @@ package domain
 
 type (
 	ChannelRepository interface {
-		List() ([]Channel, error)
-		Get(id string) (Channel, error)
-		Delete(id string) (Channel, error)
-		Update(c *Channel) error
-		Replace(c *Channel) error
-		Create(c *Channel) error
+		List(ServerId string) ([]Channel, error)
+		Get(ChannelId string, ServerId string) (Channel, error)
+		Delete(ChannelId string, ServerId string) error
+		Update(c *Channel, ServerId string) error
+		Replace(c *Channel, ServerId string) error
+		Create(c *Channel, ServerId string) error
 	}
 	Channel struct {
-		ChannelId	   string		`json:"channel_id,omitempty" firestore:"-"`
+		ChannelId	   string		`json:"id,omitempty" firestore:"-"`
 		Flags		   int64		`json:"flags,omitempty" firestore:"flags,omitempty"`
 	}
 )
