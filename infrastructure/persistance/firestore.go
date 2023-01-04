@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	firestore "cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
@@ -36,7 +38,6 @@ func init() {
 // function that returns a map with the data of a firestore doc
 func Get(path string) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
-	var err error
 
 	doc, err := Client.Doc(path).Get(ctx)
 	if err != nil {
@@ -45,8 +46,7 @@ func Get(path string) (map[string]interface{}, error) {
 	}
 
 	data = doc.Data()
-	id := "id"
-	data[id] = doc.Ref.ID
+	data["id"] = doc.Ref.ID
 
 	return data, err
 }
@@ -97,4 +97,37 @@ func Update(path string, data interface{}, id string) error{
     }
 
     return nil
+}
+
+// function to list all documents of a Collection
+func List(path string) ([]map[string]interface{}, error) {
+	ctx := context.Background()
+	var docArr []map[string]interface{}
+
+	collRef := Client.Collection(path)
+
+	iter := collRef.Documents(ctx)
+
+	for {
+		doc, err := iter.Next()
+
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Fatalln(err)
+		}
+		docPath := doc.Ref.Path
+		parts := strings.Split(docPath, "/")
+
+		// Get the portion of the path after the "servers" collection
+		subpath := strings.Join(parts[5:], "/")
+
+
+		channelMap, err := Get(subpath)
+		docArr = append(docArr, channelMap)	
+	}
+
+	return docArr, nil
+
 }
