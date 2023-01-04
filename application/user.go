@@ -1,7 +1,6 @@
 package application
 
 import (
-	"fmt"
 	"github.com/shuxbot/shux-api/domain"
 )
 
@@ -11,7 +10,6 @@ type UserApp struct{
 
 func (app *UserApp) Get(UserId string, ServerId string) (domain.User, error){
 	user, err := app.UserRepo.Get(UserId, ServerId)
-	fmt.Println(user)
 
 	return user, err
 }

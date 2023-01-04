@@ -15,6 +15,9 @@ type FirestoreUserRepository struct {
 func (t *FirestoreUserRepository) Get(UserId string, ServerId string) (domain.User, error){
 	path := fmt.Sprintf("servers/%s/users/%s", ServerId, UserId)
 	userMap, err := persistance.Get(path)
+	if err != nil {
+		return domain.User{}, err
+	}
 
 	jsonUser, err := json.Marshal(userMap)
     if err != nil {

@@ -2,6 +2,8 @@ package infrastructure
 
 import (
 	"encoding/json"
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/shuxbot/shux-api/application"
 	"github.com/shuxbot/shux-api/domain"
@@ -22,7 +24,7 @@ func bodyToUserStruct(c *fiber.Ctx) domain.User {
 
 func result(success bool, err error) map[string]interface{} {
 	status := make(map[string]interface{})
-	status["error"] = err
+	status["error"] = err.Error()
 	status["success"] = success
 
 	return status
