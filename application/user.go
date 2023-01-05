@@ -38,8 +38,6 @@ func (app *UserApp) Create(u *domain.User, ServerId string) error{
 	return err
 }
 
-
-
 func NewUserApp(userRepo domain.UserRepository) *UserApp {
 	return &UserApp{UserRepo: userRepo}
 }
