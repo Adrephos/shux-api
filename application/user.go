@@ -26,6 +26,12 @@ func (app *UserApp) Update(u *domain.User, ServerId string) error{
 	return err
 }
 
+func (app *UserApp) Replace(u *domain.User, ServerId string) error{
+	err := app.UserRepo.Replace(u, ServerId)
+
+	return err
+}
+
 func (app *UserApp) Create(u *domain.User, ServerId string) error{
 	err := app.UserRepo.Create(u, ServerId)
 
