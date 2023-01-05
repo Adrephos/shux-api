@@ -11,6 +11,6 @@ type (
 	}
 	Channel struct {
 		ChannelId	   string		`json:"id,omitempty" firestore:"-"`
-		Flags		   int64		`json:"flags,omitempty" firestore:"flags,omitempty"`
+		Flags		   int64		`json:"flags,omitempty" firestore:"flags"`
 	}
 )

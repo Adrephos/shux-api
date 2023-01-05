@@ -11,7 +11,7 @@ type (
 	}
 	Role struct {
 		RoleId		string		`json:"role_id,omitempty" firestore:"-"`
-		Name		string		`json:"name,omitempty" firestore:"name,omitempty"`
-		Flags		int64		`json:"flags,omitempty" firestore:"flags,omitempty"`
+		Name		string		`json:"name,omitempty" firestore:"name"`
+		Flags		int64		`json:"flags,omitempty" firestore:"flags"`
 	}
 )
