@@ -55,7 +55,7 @@ func Get(path string) (map[string]interface{}, error) {
 func Delete(path string, id string) error {
 	docRef := Client.Collection(path).Doc(id)
 	_, err := docRef.Delete(ctx)
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return err
 	}
@@ -64,39 +64,61 @@ func Delete(path string, id string) error {
 }
 
 // function to create a doc in firestore in a given path
-func Create(path string, data interface{}, id string) error{
+func Create(path string, data interface{}, id string) error {
 	docRef := Client.Collection(path).Doc(id)
 	_, err := docRef.Set(ctx, data)
-    if err != nil {
+	if err != nil {
 		fmt.Println(err)
-        return err
-    }
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 // functions to update a existing doc with its id and path
-func Update(path string, data interface{}, id string) error{
+func Update(path string, data interface{}, id string) error {
 	dataJson, err := json.Marshal(data)
 	if err != nil {
 		fmt.Println(err)
-        return err
+		return err
 	}
 
 	var dataMap map[string]interface{}
-    err = json.Unmarshal(dataJson, &dataMap)
-    if err != nil {
-        return err
-    }
+	err = json.Unmarshal(dataJson, &dataMap)
+	if err != nil {
+		return err
+	}
+	value, ok := dataMap["warnings_record"]
+	fmt.Printf("%T", value)
 
 	docRef := Client.Collection(path).Doc(id)
-	_, err = docRef.Set(ctx, dataMap, firestore.MergeAll)
-    if err != nil {
-		fmt.Println(err)
-        return err
-    }
 
-    return nil
+	if ok {
+		warningsArr, ok := value.([]interface{})
+		if ok {
+			for _, item := range(warningsArr) {
+				_, err = docRef.Update(ctx, []firestore.Update{
+					{
+						FieldPath: []string{"warnings_record"},
+						Value:     firestore.ArrayUnion(item),
+					},
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+		delete(dataMap, "warnings_record")
+	}
+
+	_, err = docRef.Set(ctx, dataMap, firestore.MergeAll)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
 }
 
 // function to list all documents of a Collection
@@ -123,9 +145,8 @@ func List(path string) ([]map[string]interface{}, error) {
 		// Get the portion of the path after the "servers" collection
 		subpath := strings.Join(parts[5:], "/")
 
-
 		channelMap, err := Get(subpath)
-		docArr = append(docArr, channelMap)	
+		docArr = append(docArr, channelMap)
 	}
 
 	return docArr, nil
