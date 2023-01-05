@@ -38,10 +38,8 @@ func (t *FirestoreUserRepository) Get(UserId string, ServerId string) (domain.Us
 func (t *FirestoreUserRepository) Delete(UserId string, ServerId string) error {
 	path := fmt.Sprintf("servers/%s/users", ServerId)
 	err := persistance.Delete(path, UserId)
-	if err != nil{
-		return err
-	}
-	return nil
+
+	return err
 }
 
 func (t *FirestoreUserRepository) Update(u *domain.User, ServerId string) error {
@@ -49,12 +47,11 @@ func (t *FirestoreUserRepository) Update(u *domain.User, ServerId string) error 
 	err := persistance.Update(path, *u, u.UserId)
 
 	return err
-
 }
 
 func (t *FirestoreUserRepository) Replace(u *domain.User, ServerId string) error {
 	path := fmt.Sprintf("servers/%s/users", ServerId)
-	err := persistance.Update(path, *u, u.UserId)
+	err := persistance.Create(path, *u, u.UserId)
 	
 	return err
 
