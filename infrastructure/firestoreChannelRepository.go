@@ -1,16 +1,11 @@
 package infrastructure
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
-	"log"
-	"strings"
-
+	"encoding/json"
 	firestore "cloud.google.com/go/firestore"
 	"github.com/shuxbot/shux-api/domain"
 	"github.com/shuxbot/shux-api/infrastructure/persistance"
-	"google.golang.org/api/iterator"
 )
 
 type FirestoreChannelRepository struct {
@@ -18,31 +13,16 @@ type FirestoreChannelRepository struct {
 }
 
 func (t *FirestoreChannelRepository) List(ServerId string) ([]domain.Channel, error) {
-	ctx := context.Background()
 	var channelArr []domain.Channel
 	path := fmt.Sprintf("servers/%s/channels", ServerId)
 
-	collRef := t.Client.Collection(path)
+	channelMapArr, err := persistance.List(path)
 
-	iter := collRef.Documents(ctx)
+	if err != nil{
+		return channelArr, err
+	}
 
-	for {
-		doc, err := iter.Next()
-
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			log.Fatalln(err)
-		}
-		docPath := doc.Ref.Path
-		parts := strings.Split(docPath, "/")
-
-		// Get the portion of the path after the "servers" collection
-		subpath := strings.Join(parts[5:], "/")
-
-
-		channelMap, err := persistance.Get(subpath)
+	for _, channelMap := range channelMapArr {
 		jsonChannel, err := json.Marshal(channelMap)
 		if err != nil {
 			fmt.Println(err)
@@ -63,24 +43,54 @@ func (t *FirestoreChannelRepository) List(ServerId string) ([]domain.Channel, er
 }
 
 func (t *FirestoreChannelRepository) Get(ChannelId string, ServerId string) (domain.Channel, error) {
+	path := fmt.Sprintf("servers/%s/channels/%s", ServerId, ChannelId)
+	channelMap, err := persistance.Get(path)
+	if err != nil {
+		return domain.Channel{}, err
+	}
+
+	jsonChannel, err := json.Marshal(channelMap)
+    if err != nil {
+        fmt.Println(err)
+		return domain.Channel{}, err
+    }
+
 	var c domain.Channel
-	return c, nil
+	err = json.Unmarshal(jsonChannel, &c)
+	if err != nil {
+        fmt.Println(err)
+		return domain.Channel{}, err
+    }
+
+	return c, err
 }
 
 func (t *FirestoreChannelRepository) Delete(ChannelId string, ServerId string) error {
-	return nil
+	path := fmt.Sprintf("servers/%s/channels", ServerId)
+	err := persistance.Delete(path, ChannelId)
+
+	return err
 }
 
 func (t *FirestoreChannelRepository) Update(c *domain.Channel, ServerId string) error {
-	return nil
+	path := fmt.Sprintf("servers/%s/channels", ServerId)
+	err := persistance.Update(path, *c, c.ChannelId)
+
+	return err
 }
 
 func (t *FirestoreChannelRepository) Replace(c *domain.Channel, ServerId string) error {
-	return nil
+	path := fmt.Sprintf("servers/%s/channels", ServerId)
+	err := persistance.Create(path, *c, c.ChannelId)
+	
+	return err
 }
 
 func (t *FirestoreChannelRepository) Create(c *domain.Channel, ServerId string) error {
-	return nil
+	path := fmt.Sprintf("servers/%s/channels", ServerId)
+	err := persistance.Create(path, *c, c.ChannelId)
+
+	return err
 }
 
 func NewFirestoreChannelRepo(client *firestore.Client) *FirestoreChannelRepository {
