@@ -22,11 +22,16 @@ func main() {
 	app.Get("/servers/:server_id/users/:user_id", routeHandler.GetUser)
 	app.Delete("/servers/:server_id/users/:user_id", routeHandler.DeleteUser)
 	app.Patch("/servers/:server_id/users/:user_id", routeHandler.UpdateUser)
-	app.Put("/servers/:server_id/users/:user_id", routeHandler.CreateUser)
+	app.Put("/servers/:server_id/users/:user_id", routeHandler.ReplaceUser)
 	app.Post("/servers/:server_id/users/:user_id", routeHandler.CreateUser)
 
 	//Channel endpoints
 	app.Get("/servers/:server_id/channels", routeHandler.ListChannels)
+	app.Get("/servers/:server_id/channels/:channel_id", routeHandler.GetChannel)
+	app.Delete("/servers/:server_id/channels/:channel_id", routeHandler.DeleteChannel)
+	app.Patch("/servers/:server_id/channels/:channel_id", routeHandler.UpdateChannel)
+	app.Put("/servers/:server_id/channels/:channel_id", routeHandler.ReplaceChannel)
+	app.Post("/servers/:server_id/channels/:channel_id", routeHandler.CreateChannel)
 
 	app.Listen(":3000")
 }
