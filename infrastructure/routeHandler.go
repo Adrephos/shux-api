@@ -2,8 +2,6 @@ package infrastructure
 
 import (
 	"encoding/json"
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/shuxbot/shux-api/application"
 	"github.com/shuxbot/shux-api/domain"
