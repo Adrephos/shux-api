@@ -12,9 +12,11 @@ func main() {
 	firestoreClient := persistance.Client
 	userRepo := infrastructure.NewFirestoreUserRepo(firestoreClient)
 	channelRepo := infrastructure.NewFirestoreChannelRepo(firestoreClient)
+	roleRepo := infrastructure.NewFirestoreRoleRepo(firestoreClient)
 	userApp := application.NewUserApp(userRepo)
 	channelApp := application.NewChannelApp(channelRepo)
-	routeHandler := infrastructure.NewRouteHandler(userApp, channelApp)
+	roleApp := application.NewRoleApp(roleRepo)
+	routeHandler := infrastructure.NewRouteHandler(userApp, channelApp, roleApp)
 
 	app := fiber.New()
 
@@ -32,6 +34,14 @@ func main() {
 	app.Patch("/servers/:server_id/channels/:channel_id", routeHandler.UpdateChannel)
 	app.Put("/servers/:server_id/channels/:channel_id", routeHandler.ReplaceChannel)
 	app.Post("/servers/:server_id/channels/:channel_id", routeHandler.CreateChannel)
+
+	//Role endpoints
+	app.Get("/servers/:server_id/roles", routeHandler.ListRoles)
+	app.Get("/servers/:server_id/roles/:role_id", routeHandler.GetRole)
+	app.Delete("/servers/:server_id/roles/:role_id", routeHandler.DeleteRole)
+	app.Patch("/servers/:server_id/roles/:role_id", routeHandler.UpdateRole)
+	app.Put("/servers/:server_id/roles/:role_id", routeHandler.ReplaceRole)
+	app.Post("/servers/:server_id/roles/:role_id", routeHandler.CreateRole)
 
 	app.Listen(":3000")
 }
