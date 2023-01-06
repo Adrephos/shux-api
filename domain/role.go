@@ -2,7 +2,7 @@ package domain
 
 type (
 	RoleRepository interface {
-		List() ([]Role, error)
+	List(ServerId string) ([]Role, error)
 		Get(RoleId string, ServerId string) (Role, error)
 		Delete(RoleId string, ServerId string) error
 		Update(r *Role, ServerId string) error
