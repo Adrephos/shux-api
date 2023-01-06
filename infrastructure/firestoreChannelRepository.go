@@ -74,7 +74,10 @@ func (t *FirestoreChannelRepository) Delete(ChannelId string, ServerId string) e
 
 func (t *FirestoreChannelRepository) Update(c *domain.Channel, ServerId string) error {
 	path := fmt.Sprintf("servers/%s/channels", ServerId)
-	err := persistance.Update(path, *c, c.ChannelId)
+	id := c.ChannelId
+	c.ChannelId = ""
+	err := persistance.Update(path, *c, id)
+
 
 	return err
 }
