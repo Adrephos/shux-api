@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/shuxbot/shux-api/application"
@@ -11,6 +12,7 @@ import (
 type routeHandler struct {
 	userApp    *application.UserApp
 	channelApp *application.ChannelApp
+	roleApp    *application.RoleApp
 }
 
 func bodyToUserStruct(c *fiber.Ctx) domain.User {
@@ -27,6 +29,14 @@ func bodyToChannelStruct(c *fiber.Ctx) domain.Channel {
 	ch.ChannelId = c.Params("channel_id")
 
 	return ch
+}
+
+func bodyToRoleStruct(c *fiber.Ctx) domain.Role {
+	var rl domain.Role
+	json.Unmarshal(c.Body(), &rl)
+	rl.RoleId = c.Params("role_id")
+
+	return rl
 }
 
 func result(success bool, err error, data interface{}) map[string]interface{} {
@@ -59,6 +69,7 @@ func (h *routeHandler) DeleteUser(c *fiber.Ctx) error {
 
 func (h *routeHandler) UpdateUser(c *fiber.Ctx) error {
 	u := bodyToUserStruct(c)
+	fmt.Println(u)
 	err := h.userApp.Update(&u, c.Params("server_id"))
 
 	if err != nil {
@@ -147,6 +158,65 @@ func (h *routeHandler) CreateChannel(c *fiber.Ctx) error {
 	return c.JSON(result(true, nil, ch))
 }
 
-func NewRouteHandler(userApp *application.UserApp, channelApp *application.ChannelApp) *routeHandler {
-	return &routeHandler{userApp: userApp, channelApp: channelApp}
+func (h *routeHandler) ListRoles(c *fiber.Ctx) error {
+	rlMap := make(map[string]interface{})
+	rlArr, err := h.roleApp.List(c.Params("server_id"))
+	rlMap["roles"] = rlArr
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	return c.JSON(result(true, nil, rlMap))
+}
+
+func (h *routeHandler) GetRole(c *fiber.Ctx) error {
+	rl, err := h.roleApp.Get(c.Params("role_id"), c.Params("server_id"))
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, rl))
+}
+
+func (h *routeHandler) DeleteRole(c *fiber.Ctx) error {
+	err := h.roleApp.Delete(c.Params("role_id"), c.Params("server_id"))
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, c.Params("role_id")))
+}
+
+func (h *routeHandler) UpdateRole(c *fiber.Ctx) error {
+	rl := bodyToRoleStruct(c)
+	err := h.roleApp.Update(&rl, c.Params("server_id"))
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, rl))
+
+}
+
+func (h *routeHandler) ReplaceRole(c *fiber.Ctx) error {
+	rl := bodyToRoleStruct(c)
+	err := h.roleApp.Replace(&rl, c.Params("server_id"))
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, rl))
+}
+
+func (h *routeHandler) CreateRole(c *fiber.Ctx) error {
+	rl := bodyToRoleStruct(c)
+	err := h.roleApp.Create(&rl, c.Params("server_id"))
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, rl))
+}
+
+func NewRouteHandler(userApp *application.UserApp, channelApp *application.ChannelApp, roleApp *application.RoleApp) *routeHandler {
+	return &routeHandler{userApp: userApp, channelApp: channelApp, roleApp: roleApp}
 }
