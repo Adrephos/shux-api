@@ -69,7 +69,6 @@ func (h *routeHandler) DeleteUser(c *fiber.Ctx) error {
 
 func (h *routeHandler) UpdateUser(c *fiber.Ctx) error {
 	u := bodyToUserStruct(c)
-	fmt.Println(u)
 	err := h.userApp.Update(&u, c.Params("server_id"))
 
 	if err != nil {
