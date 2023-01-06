@@ -89,7 +89,6 @@ func Update(path string, data interface{}, id string) error {
 		return err
 	}
 	value, ok := dataMap["warnings_record"]
-	fmt.Printf("%T", value)
 
 	docRef := Client.Collection(path).Doc(id)
 
