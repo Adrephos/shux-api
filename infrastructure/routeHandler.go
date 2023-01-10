@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"encoding/json"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/shuxbot/shux-api/application"
 	"github.com/shuxbot/shux-api/domain"
@@ -11,6 +12,7 @@ type routeHandler struct {
 	userApp    *application.UserApp
 	channelApp *application.ChannelApp
 	roleApp    *application.RoleApp
+	serverApp  *application.ServerApp
 }
 
 func bodyToUserStruct(c *fiber.Ctx) domain.User {
@@ -214,6 +216,17 @@ func (h *routeHandler) CreateRole(c *fiber.Ctx) error {
 	return c.JSON(result(true, nil, rl))
 }
 
-func NewRouteHandler(userApp *application.UserApp, channelApp *application.ChannelApp, roleApp *application.RoleApp) *routeHandler {
-	return &routeHandler{userApp: userApp, channelApp: channelApp, roleApp: roleApp}
+func (h *routeHandler) ListServers(c *fiber.Ctx) error {
+	mapId := make(map[string]interface{})
+	idArr,err := h.serverApp.List()
+	mapId["servers_id"] = idArr
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, mapId))
+}
+
+func NewRouteHandler(userApp *application.UserApp, channelApp *application.ChannelApp, roleApp *application.RoleApp, serverApp *application.ServerApp) *routeHandler {
+	return &routeHandler{userApp: userApp, channelApp: channelApp, roleApp: roleApp, serverApp: serverApp}
 }
