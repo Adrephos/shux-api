@@ -144,8 +144,8 @@ func List(path string) ([]map[string]interface{}, error) {
 		// Get the portion of the path after the "servers" collection
 		subpath := strings.Join(parts[5:], "/")
 
-		channelMap, err := Get(subpath)
-		docArr = append(docArr, channelMap)
+		docMap, err := Get(subpath)
+		docArr = append(docArr, docMap)
 	}
 
 	return docArr, nil
