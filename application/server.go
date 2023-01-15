@@ -20,6 +20,21 @@ func (app *ServerApp) GetRanking(ServerId string) ([]map[string]interface{}, err
 	return serverRanking, err
 }
 
+func (app *ServerApp) GetUserRank(ServerId string, UserId string) (map[string]interface{}, error) {
+	serverRanking, err := app.GetRanking(ServerId)
+
+	var user map[string]interface{}
+
+	for _, item := range(serverRanking){
+		if  item["id"] == UserId {
+			user = item
+			break
+		}
+	}
+
+	return user, err
+}
+
 func NewServerApp(serverRepo domain.ServerRepository) *ServerApp {
 	return &ServerApp{ServerRepo: serverRepo}
 }

@@ -66,14 +66,12 @@ func (t *FirestoreServerRepository) GetRanking(ServerId string) ([]map[string]in
 
 		docMap, err := persistance.Get(subpath)
 		userRank := make(map[string]interface{})
-		user:= make(map[string]interface{})
 
 		userRank["points"] = docMap["points"]
 		userRank["rank"] = pos
-		id, _ := docMap["id"].(string)
-		user[id] = userRank
+		userRank["id"] = docMap["id"]
 
-		userArr = append(userArr, user)
+		userArr = append(userArr, userRank)
 
 		pos++
 	}

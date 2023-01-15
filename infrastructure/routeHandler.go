@@ -239,6 +239,18 @@ func (h *routeHandler) ServerRanking(c *fiber.Ctx) error{
 
 }
 
+func (h *routeHandler) ServerUserRanking(c *fiber.Ctx) error{
+	ranking := make(map[string]interface{})
+	userRank, err := h.serverApp.GetUserRank(c.Params("server_id"), c.Params("user_id"))
+	ranking["user"] = userRank
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, ranking))
+
+}
+
 func NewRouteHandler(userApp *application.UserApp, channelApp *application.ChannelApp, roleApp *application.RoleApp, serverApp *application.ServerApp) *routeHandler {
 	return &routeHandler{userApp: userApp, channelApp: channelApp, roleApp: roleApp, serverApp: serverApp}
 }

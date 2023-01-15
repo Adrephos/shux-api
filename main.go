@@ -26,6 +26,7 @@ func main() {
 	//Server endpoints
 	app.Get("/servers", routeHandler.ListServers)
 	app.Get("/servers/:server_id/ranking", routeHandler.ServerRanking)
+	app.Get("/servers/:server_id/ranking/:user_id", routeHandler.ServerUserRanking)
 
 	//User endpoints
 	app.Get("/servers/:server_id/users/:user_id", routeHandler.GetUser)
