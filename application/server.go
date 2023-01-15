@@ -14,6 +14,12 @@ func (app *ServerApp) List() ([]string, error) {
 	return idArr, err
 }
 
+func (app *ServerApp) GetRanking(ServerId string) ([]map[string]interface{}, error) {
+	serverRanking, err := app.ServerRepo.GetRanking(ServerId)
+
+	return serverRanking, err
+}
+
 func NewServerApp(serverRepo domain.ServerRepository) *ServerApp {
 	return &ServerApp{ServerRepo: serverRepo}
 }
