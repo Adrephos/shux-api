@@ -2,7 +2,6 @@ package persistance
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +9,7 @@ import (
 
 	firestore "cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"github.com/goccy/go-json"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )

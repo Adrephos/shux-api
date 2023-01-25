@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"fmt"
-	"encoding/json"
+	"github.com/goccy/go-json"
 	firestore "cloud.google.com/go/firestore"
 	"github.com/shuxbot/shux-api/domain"
 	"github.com/shuxbot/shux-api/infrastructure/persistance"
