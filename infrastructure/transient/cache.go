@@ -28,36 +28,36 @@ func New(post bool) func(*fiber.Ctx) error {
 		var t time.Duration
 		t = 0
 
-		if c.Method() == fiber.MethodGet {
-			if found {
-				entry := val.(CacheEntry)
-				c.Response().SetBody(entry.Body)
-				c.Response().SetStatusCode(entry.StatusCode)
-				c.Response().Header.SetContentTypeBytes(entry.ContentType)
-				return nil
-			}
-			c.Locals("cacheKey", key)
-
-			if !post {
-				t = 30 * time.Minute
-			}
-
-			err := c.Next()
-
-			if err == nil {
-				cache.Set(key, CacheEntry{
-					Body:        c.Response().Body(),
-					StatusCode:  c.Response().StatusCode(),
-					ContentType: c.Response().Header.ContentType(),
-				}, t)
-			}
-
-			return err
-		} else {
+		if c.Method() != fiber.MethodGet {
 			cache.Delete(key)
 			err := c.Next()
 			return err
 		}
+
+		if found {
+			entry := val.(CacheEntry)
+			c.Response().SetBody(entry.Body)
+			c.Response().SetStatusCode(entry.StatusCode)
+			c.Response().Header.SetContentTypeBytes(entry.ContentType)
+			return nil
+		}
+		c.Locals("cacheKey", key)
+
+		if !post {
+			t = 30 * time.Minute
+		}
+
+		err := c.Next()
+
+		if err == nil {
+			cache.Set(key, CacheEntry{
+				Body:        c.Response().Body(),
+				StatusCode:  c.Response().StatusCode(),
+				ContentType: c.Response().Header.ContentType(),
+			}, t)
+		}
+
+		return err
 
 	}
 }
