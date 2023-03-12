@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	//Initialize all repos and apps
 	firestoreClient := persistance.Client
 	userRepo := infrastructure.NewFirestoreUserRepo(firestoreClient)
