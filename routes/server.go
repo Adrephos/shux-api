@@ -11,6 +11,5 @@ func ServerEndpoints(app *fiber.App, routeHandler *routing.RouteHandler) {
 	route := app.Group("api/v1")
 
 	route.Get("/servers", transient.New(false), routeHandler.ListServers)
-	route.Get("/servers/:server_id/ranking", transient.New(false), routeHandler.ServerRanking)
-	route.Get("/servers/:server_id/ranking/:user_id", transient.New(false), routeHandler.ServerUserRanking)
+	route.Get("/servers/:server_id/leaderboard", transient.New(false), routeHandler.ServerRanking)
 }

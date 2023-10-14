@@ -15,4 +15,5 @@ func UserEndpoints(app *fiber.App, routeHandler *routing.RouteHandler) {
 	route.Patch("/users/:user_id", transient.New(true), routeHandler.UpdateUser)
 	route.Put("/users/:user_id", transient.New(true), routeHandler.ReplaceUser)
 	route.Post("/users/:user_id", transient.New(true), routeHandler.CreateUser)
+	route.Get("/users/:user_id/rank", transient.New(false), routeHandler.ServerUserRanking)
 }

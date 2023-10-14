@@ -233,7 +233,7 @@ func (h *RouteHandler) ListServers(c *fiber.Ctx) error {
 
 func (h *RouteHandler) ServerRanking(c *fiber.Ctx) error{
 	ranking := make(map[string]interface{})
-	serverRanking, err := h.serverApp.GetRanking(c.Params("server_id"))
+	serverRanking, err := h.serverApp.GetLeaderboard(c.Params("server_id"))
 	ranking["ranking"] = serverRanking
 
 	if err != nil {
@@ -252,7 +252,6 @@ func (h *RouteHandler) ServerUserRanking(c *fiber.Ctx) error{
 		return c.Status(404).JSON(result(false, err, nil))
 	}
 	return c.JSON(result(true, nil, ranking))
-
 }
 
 func NewRouteHandler(userApp *application.UserApp, channelApp *application.ChannelApp, roleApp *application.RoleApp, serverApp *application.ServerApp) *RouteHandler {

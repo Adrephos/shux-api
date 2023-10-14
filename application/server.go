@@ -14,14 +14,14 @@ func (app *ServerApp) List() ([]string, error) {
 	return idArr, err
 }
 
-func (app *ServerApp) GetRanking(ServerId string) ([]map[string]interface{}, error) {
+func (app *ServerApp) GetLeaderboard(ServerId string) ([]map[string]interface{}, error) {
 	serverRanking, err := app.ServerRepo.GetRanking(ServerId)
 
-	return serverRanking, err
+	return serverRanking[:5], err
 }
 
 func (app *ServerApp) GetUserRank(ServerId string, UserId string) (map[string]interface{}, error) {
-	serverRanking, err := app.GetRanking(ServerId)
+	serverRanking, err := app.ServerRepo.GetRanking(ServerId)
 
 	var user map[string]interface{}
 

@@ -3,10 +3,8 @@ package infrastructure
 import (
 	"context"
 	"log"
-	"strings"
 
 	"cloud.google.com/go/firestore"
-	"github.com/shuxbot/shux-api/infrastructure/persistance"
 	"google.golang.org/api/iterator"
 )
 
@@ -39,7 +37,7 @@ func (t *FirestoreServerRepository) List() ([]string, error) {
 
 }
 
-func (t *FirestoreServerRepository) GetRanking(ServerId string) ([]map[string]interface{}, error){
+func (t *FirestoreServerRepository) GetRanking(ServerId string) ([]map[string]interface{}, error) {
 	client := t.Client
 	ctx := context.Background()
 	usersRef := client.Collection("servers").Doc(ServerId).Collection("users")
@@ -48,7 +46,7 @@ func (t *FirestoreServerRepository) GetRanking(ServerId string) ([]map[string]in
 
 	iter := rankRef.Documents(ctx)
 	pos := 1
-	
+
 	for {
 		doc, err := iter.Next()
 
@@ -58,24 +56,19 @@ func (t *FirestoreServerRepository) GetRanking(ServerId string) ([]map[string]in
 		if err != nil {
 			log.Fatalln(err)
 		}
-		docPath := doc.Ref.Path
-		parts := strings.Split(docPath, "/")
 
-		// Get the portion of the path after the "servers" collection
-		subpath := strings.Join(parts[5:], "/")
-
-		docMap, err := persistance.Get(subpath)
+		docMap := doc.Data()
 		userRank := make(map[string]interface{})
 
 		userRank["points"] = docMap["points"]
 		userRank["rank"] = pos
-		userRank["id"] = docMap["id"]
+		userRank["id"] = doc.Ref.ID
 
 		userArr = append(userArr, userRank)
 
 		pos++
 	}
-	
+
 	return userArr, nil
 }
 
