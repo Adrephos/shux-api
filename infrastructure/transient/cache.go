@@ -44,6 +44,7 @@ func New(post bool) func(*fiber.Ctx) error {
 		c.Locals("cacheKey", key)
 
 		if !post {
+			// For values with no POST method, cache for 30 minutes
 			t = 30 * time.Minute
 		}
 
