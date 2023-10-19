@@ -161,15 +161,15 @@ func (h *RouteHandler) CreateChannel(c *fiber.Ctx) error {
 
 // Role endpoints
 func (h *RouteHandler) ListRoles(c *fiber.Ctx) error {
-	rlMap := make(map[string]interface{})
-	rlArr, err := h.roleApp.List(c.Params("server_id"))
-	rlMap["roles"] = rlArr
+	roleMap := make(map[string]interface{})
+	roleArr, err := h.roleApp.List(c.Params("server_id"))
+	roleMap["roles"] = roleArr
 
 	if err != nil {
 		return c.Status(404).JSON(result(false, err, nil))
 	}
 
-	return c.JSON(result(true, nil, rlMap))
+	return c.JSON(result(true, nil, roleMap))
 }
 
 func (h *RouteHandler) GetRole(c *fiber.Ctx) error {

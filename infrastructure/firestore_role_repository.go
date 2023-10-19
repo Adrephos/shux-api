@@ -23,14 +23,14 @@ func (t *FirestoreRoleRepository) List(ServerId string) ([]domain.Role, error) {
 	}
 
 	for _, roleMap := range roleMapArr {
-		jsonChannel, err := json.Marshal(roleMap)
+		jsonRole, err := json.Marshal(roleMap)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
 		}
 
 		var r domain.Role
-		err = json.Unmarshal(jsonChannel, &r)
+		err = json.Unmarshal(jsonRole, &r)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err

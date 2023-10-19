@@ -21,10 +21,10 @@ var app *firebase.App
 // fuction to intilize the firestore client
 func init() {
 	var err error
-	sapath, _ := os.LookupEnv("SHUX_API_SA")
+	serviceAccsPath, _ := os.LookupEnv("SHUX_API_SA")
 
-	sa := option.WithCredentialsFile(sapath)
-	app, err = firebase.NewApp(ctx, nil, sa)
+	serviceAcc := option.WithCredentialsFile(serviceAccsPath)
+	app, err = firebase.NewApp(ctx, nil, serviceAcc)
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -16,14 +16,19 @@ import (
 func main() {
 	//Initialize all repos and apps
 	firestoreClient := persistance.Client
+
+	// Initialize all repos and apps
 	userRepo := infrastructure.NewFirestoreUserRepo(firestoreClient)
 	channelRepo := infrastructure.NewFirestoreChannelRepo(firestoreClient)
 	roleRepo := infrastructure.NewFirestoreRoleRepo(firestoreClient)
 	serverRepo := infrastructure.NewFirestoreServerRepo(firestoreClient)
+
 	userApp := application.NewUserApp(userRepo)
 	channelApp := application.NewChannelApp(channelRepo)
 	roleApp := application.NewRoleApp(roleRepo)
 	serverApp := application.NewServerApp(serverRepo)
+
+	// Initialize route handler
 	routeHandler := routing.NewRouteHandler(userApp, channelApp, roleApp, serverApp)
 
 	app := fiber.New(fiber.Config{
