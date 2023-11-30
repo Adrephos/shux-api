@@ -1,5 +1,5 @@
 // Based on https://github.com/codemicro/fiber-cache
-package transient
+package middlewares
 
 import (
 	"time"
@@ -21,7 +21,7 @@ func init() {
 	cache = gc.New(gc.NoExpiration, 0)
 }
 
-func New(post bool) func(*fiber.Ctx) error {
+func NewInCache(post bool) func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		key := utils.CopyString(c.Path())
 		val, found := cache.Get(key)
