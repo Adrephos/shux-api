@@ -7,7 +7,9 @@ require (
 	firebase.google.com/go v3.13.0+incompatible
 	github.com/goccy/go-json v0.10.0
 	github.com/gofiber/fiber/v2 v2.40.1
+	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	google.golang.org/api v0.105.0
 )
 
