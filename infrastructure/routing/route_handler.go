@@ -1,10 +1,14 @@
 package routing
 
 import (
+	"errors"
+
 	"github.com/goccy/go-json"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/shuxbot/shux-api/application"
+	"github.com/shuxbot/shux-api/auth"
 	"github.com/shuxbot/shux-api/domain"
 )
 
@@ -13,6 +17,29 @@ type RouteHandler struct {
 	channelApp *application.ChannelApp
 	roleApp    *application.RoleApp
 	serverApp  *application.ServerApp
+	adminApp   *application.AdminApp
+}
+
+func bodyToAdmin(c *fiber.Ctx) (*domain.Admin, error) {
+	var admin *domain.Admin
+	err := json.Unmarshal(c.Body(), &admin)
+
+	if err != nil {
+		return nil, err
+	} else if admin.Username == "" || admin.Password == "" {
+		return nil, errors.New("Missing cfn or ecn")
+	}
+
+	return admin, nil
+}
+
+func hashAndSalt(pwd []byte) string {
+	hash, error := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if error != nil {
+		panic(error)
+	}
+
+	return string(hash)
 }
 
 func bodyToUserStruct(c *fiber.Ctx) domain.User {
@@ -43,7 +70,7 @@ func result(success bool, err error, data interface{}) map[string]interface{} {
 	status := make(map[string]interface{})
 	if err != nil {
 		status["error"] = err.Error()
-	} else {
+	} else if data != nil {
 		status["data"] = data
 	}
 	status["success"] = success
@@ -222,7 +249,7 @@ func (h *RouteHandler) CreateRole(c *fiber.Ctx) error {
 // Server endpoints
 func (h *RouteHandler) ListServers(c *fiber.Ctx) error {
 	mapId := make(map[string]interface{})
-	idArr,err := h.serverApp.List()
+	idArr, err := h.serverApp.List()
 	mapId["servers_id"] = idArr
 
 	if err != nil {
@@ -231,7 +258,7 @@ func (h *RouteHandler) ListServers(c *fiber.Ctx) error {
 	return c.JSON(result(true, nil, mapId))
 }
 
-func (h *RouteHandler) ServerRanking(c *fiber.Ctx) error{
+func (h *RouteHandler) ServerRanking(c *fiber.Ctx) error {
 	ranking := make(map[string]interface{})
 	serverRanking, err := h.serverApp.GetLeaderboard(c.Params("server_id"))
 	ranking["ranking"] = serverRanking
@@ -243,7 +270,7 @@ func (h *RouteHandler) ServerRanking(c *fiber.Ctx) error{
 
 }
 
-func (h *RouteHandler) ServerUserRanking(c *fiber.Ctx) error{
+func (h *RouteHandler) ServerUserRanking(c *fiber.Ctx) error {
 	ranking := make(map[string]interface{})
 	userRank, err := h.serverApp.GetUserRank(c.Params("server_id"), c.Params("user_id"))
 	ranking["user"] = userRank
@@ -254,6 +281,103 @@ func (h *RouteHandler) ServerUserRanking(c *fiber.Ctx) error{
 	return c.JSON(result(true, nil, ranking))
 }
 
-func NewRouteHandler(userApp *application.UserApp, channelApp *application.ChannelApp, roleApp *application.RoleApp, serverApp *application.ServerApp) *RouteHandler {
-	return &RouteHandler{userApp: userApp, channelApp: channelApp, roleApp: roleApp, serverApp: serverApp}
+func (h *RouteHandler) RefreshToken(c *fiber.Ctx) error {
+	// Map to unmarshal JSON body
+	var token map[string]string
+	err := json.Unmarshal(c.Body(), &token)
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	_, found := auth.RefreshCache.Get(token["token"])
+	if !found {
+		return c.Status(404).JSON(result(false, errors.New("Invalid refresh token"), nil))
+	} else {
+		auth.RefreshCache.Delete(token["token"])
+	}
+
+	accessToken, err := auth.GenerateAccessToken()
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	refreshToken, err := auth.GenerateRefreshToken()
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	data := map[string]string{
+		"accessToken":  accessToken,
+		"refreshToken": refreshToken,
+	}
+
+	return c.Status(200).JSON(result(true, nil, data))
+}
+
+func (h *RouteHandler) Register(c *fiber.Ctx) error {
+	admin, err := bodyToAdmin(c)
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	admin.Password = hashAndSalt([]byte(admin.Password))
+
+	err = h.adminApp.Register(admin.Username, admin.Password)
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	return c.Status(200).JSON(result(true, nil, nil))
+}
+
+func (h *RouteHandler) Login(c *fiber.Ctx) error {
+	reqAdmin, err := bodyToAdmin(c)
+
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	admin, err := h.adminApp.Login(reqAdmin.Username)
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(reqAdmin.Password))
+	if err != nil {
+		return c.Status(404).JSON(result(false, errors.New("Incorrect password"), nil))
+	}
+
+	accessToken, err := auth.GenerateAccessToken()
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	refreshToken, err := auth.GenerateRefreshToken()
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	data := map[string]string{
+		"accessToken":  accessToken,
+		"refreshToken": refreshToken,
+	}
+
+	return c.Status(200).JSON(result(true, nil, data))
+}
+
+func NewRouteHandler(
+	userApp *application.UserApp,
+	channelApp *application.ChannelApp,
+	roleApp *application.RoleApp,
+	serverApp *application.ServerApp,
+	adminApp *application.AdminApp) *RouteHandler {
+
+	return &RouteHandler{
+		userApp:    userApp,
+		channelApp: channelApp,
+		roleApp:    roleApp,
+		serverApp:  serverApp,
+		adminApp:   adminApp,
+	}
 }
