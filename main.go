@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/goccy/go-json"
+	"os"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 
@@ -14,7 +15,7 @@ import (
 )
 
 func main() {
-	//Initialize all repos and apps
+	// Firestore client
 	firestoreClient := persistance.Client
 
 	// Initialize all repos and apps
@@ -22,14 +23,16 @@ func main() {
 	channelRepo := infrastructure.NewFirestoreChannelRepo(firestoreClient)
 	roleRepo := infrastructure.NewFirestoreRoleRepo(firestoreClient)
 	serverRepo := infrastructure.NewFirestoreServerRepo(firestoreClient)
+	adminRepo := infrastructure.NewFirestoreAdminRepo(firestoreClient)
 
 	userApp := application.NewUserApp(userRepo)
 	channelApp := application.NewChannelApp(channelRepo)
 	roleApp := application.NewRoleApp(roleRepo)
 	serverApp := application.NewServerApp(serverRepo)
+	adminApp := application.NewAdminApp(adminRepo)
 
 	// Initialize route handler
-	routeHandler := routing.NewRouteHandler(userApp, channelApp, roleApp, serverApp)
+	routeHandler := routing.NewRouteHandler(userApp, channelApp, roleApp, serverApp, adminApp)
 
 	app := fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,
@@ -42,6 +45,7 @@ func main() {
 	routes.ChannelEndpoints(app, routeHandler)
 	routes.RoleEndpoints(app, routeHandler)
 	routes.ServerEndpoints(app, routeHandler)
+	routes.JWTEndpoints(app, routeHandler)
 
-	app.Listen(":3000")
+	app.Listen(":" + os.Getenv("API_PORT"))
 }
