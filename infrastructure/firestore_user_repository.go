@@ -1,9 +1,9 @@
 package infrastructure
 
 import (
+	firestore "cloud.google.com/go/firestore"
 	"fmt"
 	"github.com/goccy/go-json"
-	firestore "cloud.google.com/go/firestore"
 	"github.com/shuxbot/shux-api/domain"
 	"github.com/shuxbot/shux-api/infrastructure/persistance"
 )
@@ -12,7 +12,7 @@ type FirestoreUserRepository struct {
 	Client *firestore.Client
 }
 
-func (t *FirestoreUserRepository) Get(UserId string, ServerId string) (domain.User, error){
+func (t *FirestoreUserRepository) Get(UserId string, ServerId string) (domain.User, error) {
 	path := fmt.Sprintf("servers/%s/users/%s", ServerId, UserId)
 	userMap, err := persistance.Get(path)
 	if err != nil {
@@ -20,17 +20,17 @@ func (t *FirestoreUserRepository) Get(UserId string, ServerId string) (domain.Us
 	}
 
 	jsonUser, err := json.Marshal(userMap)
-    if err != nil {
-        fmt.Println(err)
+	if err != nil {
+		fmt.Println(err)
 		return domain.User{}, err
-    }
+	}
 
 	var u domain.User
 	err = json.Unmarshal(jsonUser, &u)
 	if err != nil {
-        fmt.Println(err)
+		fmt.Println(err)
 		return domain.User{}, err
-    }
+	}
 
 	return u, err
 }
@@ -54,7 +54,7 @@ func (t *FirestoreUserRepository) Update(u *domain.User, ServerId string) error 
 func (t *FirestoreUserRepository) Replace(u *domain.User, ServerId string) error {
 	path := fmt.Sprintf("servers/%s/users", ServerId)
 	err := persistance.Create(path, *u, u.UserId)
-	
+
 	return err
 
 }
