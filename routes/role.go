@@ -8,7 +8,7 @@ import (
 
 func RoleEndpoints(app *fiber.App, routeHandler *routing.RouteHandler) {
 	//Role endpoints
-	route := app.Group("v1/servers/:server_id")
+	route := app.Group("api/v1/servers/:server_id")
 
 	route.Get("/roles", middlewares.VerifyToken, middlewares.NewInCache(false), routeHandler.ListRoles)
 	route.Get("/roles/:role_id", middlewares.VerifyToken, middlewares.NewInCache(true), routeHandler.GetRole)

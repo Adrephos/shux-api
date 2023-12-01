@@ -8,7 +8,7 @@ import (
 
 func ChannelEndpoints(app *fiber.App, routeHandler *routing.RouteHandler) {
 	//Channel endpoints
-	route := app.Group("v1/servers/:server_id")
+	route := app.Group("api/v1/servers/:server_id")
 
 	route.Get("/channels", middlewares.VerifyToken, middlewares.NewInCache(false), routeHandler.ListChannels)
 	route.Get("/channels/:channel_id", middlewares.VerifyToken, middlewares.NewInCache(true), routeHandler.GetChannel)

@@ -8,7 +8,7 @@ import (
 
 func UserEndpoints(app *fiber.App, routeHandler *routing.RouteHandler) {
 	//User endpoints
-	route := app.Group("v1/servers/:server_id")
+	route := app.Group("api/v1/servers/:server_id")
 
 	route.Get("/users/:user_id", middlewares.VerifyToken, middlewares.NewInCache(true), routeHandler.GetUser)
 	route.Delete("/users/:user_id", middlewares.VerifyToken, middlewares.NewInCache(true), routeHandler.DeleteUser)

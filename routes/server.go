@@ -8,7 +8,7 @@ import (
 
 func ServerEndpoints(app *fiber.App, routeHandler *routing.RouteHandler) {
 	//Server endpoints
-	route := app.Group("v1")
+	route := app.Group("api/v1")
 
 	route.Get("/servers", middlewares.VerifyToken, routeHandler.ListServers)
 	route.Get("/servers/:server_id/leaderboard", middlewares.VerifyToken, middlewares.NewInCache(false), routeHandler.ServerRanking)

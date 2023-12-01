@@ -7,7 +7,7 @@ import (
 )
 
 func JWTEndpoints(app *fiber.App, routeHandler *routing.RouteHandler) {
-	route := app.Group("v1/auth")
+	route := app.Group("api/v1/auth")
 
 	route.Post("refresh", routeHandler.RefreshToken)
 	route.Post("login", routeHandler.Login)
