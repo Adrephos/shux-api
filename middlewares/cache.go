@@ -18,15 +18,13 @@ type CacheEntry struct {
 var cache *gc.Cache
 
 func init() {
-	cache = gc.New(gc.NoExpiration, 0)
+	cache = gc.New(time.Hour, time.Hour)
 }
 
-func NewInCache(post bool) func(*fiber.Ctx) error {
+func CacheAdd(ttl time.Duration) func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		key := utils.CopyString(c.Path())
 		val, found := cache.Get(key)
-		var t time.Duration
-		t = 0
 
 		if c.Method() != fiber.MethodGet {
 			cache.Delete(key)
@@ -43,11 +41,6 @@ func NewInCache(post bool) func(*fiber.Ctx) error {
 		}
 		c.Locals("cacheKey", key)
 
-		if !post {
-			// For values with no POST method, cache for 30 minutes
-			t = 30 * time.Minute
-		}
-
 		err := c.Next()
 
 		if err == nil {
@@ -55,7 +48,7 @@ func NewInCache(post bool) func(*fiber.Ctx) error {
 				Body:        c.Response().Body(),
 				StatusCode:  c.Response().StatusCode(),
 				ContentType: c.Response().Header.ContentType(),
-			}, t)
+			}, ttl)
 		}
 
 		return err
