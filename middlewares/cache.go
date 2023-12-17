@@ -52,6 +52,5 @@ func CacheAdd(ttl time.Duration) func(*fiber.Ctx) error {
 		}
 
 		return err
-
 	}
 }

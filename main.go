@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -41,10 +42,11 @@ func main() {
 
 	app.Use(logger.New())
 
-	routes.UserEndpoints(app, routeHandler)
-	routes.ChannelEndpoints(app, routeHandler)
-	routes.RoleEndpoints(app, routeHandler)
-	routes.ServerEndpoints(app, routeHandler)
+	ttl := 30 * time.Minute
+	routes.UserEndpoints(app, routeHandler, ttl)
+	routes.ChannelEndpoints(app, routeHandler, ttl)
+	routes.RoleEndpoints(app, routeHandler, ttl)
+	routes.ServerEndpoints(app, routeHandler, ttl)
 	routes.JWTEndpoints(app, routeHandler)
 
 	app.Listen(":" + os.Getenv("API_PORT"))
