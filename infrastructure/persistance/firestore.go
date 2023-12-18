@@ -41,11 +41,10 @@ func Get(path string) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
 	doc, err := Client.Doc(path).Get(ctx)
-	fmt.Println(err)
-	if strings.Contains(err.Error(), "not found") {
-		err = errors.New("Not found")
-	}
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			err = errors.New("Not found")
+		}
 		fmt.Println(err)
 		return nil, err
 	}
@@ -100,7 +99,7 @@ func Update(path string, data interface{}, id string) error {
 	if ok {
 		warningsArr, ok := value.([]interface{})
 		if ok {
-			for _, item := range(warningsArr) {
+			for _, item := range warningsArr {
 				_, err = docRef.Update(ctx, []firestore.Update{
 					{
 						FieldPath: []string{"warnings_record"},
