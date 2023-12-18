@@ -17,7 +17,7 @@ type (
 	User struct {
 		UserId         string    `json:"id,omitempty" firestore:"-"`
 		Description    string    `json:"description,omitempty" firestore:"description"`
-		Points         int64     `json:"points,omitempty" firestore:"points"`
+		Points         float64   `json:"points,omitempty" firestore:"points"`
 		Warnings       int64     `json:"warnings,omitempty" firestore:"warnings"`
 		WarningsRecord []Warning `json:"warnings_record,omitempty" firestore:"warnings_record"`
 		Tickets        int64     `json:"tickets,omitempty" firestore:"tickets"`
