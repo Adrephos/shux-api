@@ -2,6 +2,7 @@ package persistance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -40,6 +41,10 @@ func Get(path string) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
 	doc, err := Client.Doc(path).Get(ctx)
+	fmt.Println(err)
+	if strings.Contains(err.Error(), "not found") {
+		err = errors.New("Not found")
+	}
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
