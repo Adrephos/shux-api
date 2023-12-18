@@ -1,6 +1,8 @@
 package application
 
 import (
+	"errors"
+
 	"github.com/shuxbot/shux-api/domain"
 )
 
@@ -16,23 +18,23 @@ func (app *ServerApp) List() ([]string, error) {
 
 func (app *ServerApp) GetLeaderboard(ServerId string) ([]map[string]interface{}, error) {
 	serverRanking, err := app.ServerRepo.GetRanking(ServerId)
-
+	if err != nil {
+		return nil, err
+	}
+	if len(serverRanking) < 5 {
+		return nil, errors.New("Not enough users")
+	}
 	return serverRanking[:5], err
 }
 
 func (app *ServerApp) GetUserRank(ServerId string, UserId string) (map[string]interface{}, error) {
 	serverRanking, err := app.ServerRepo.GetRanking(ServerId)
-
-	var user map[string]interface{}
-
 	for _, item := range(serverRanking){
 		if  item["id"] == UserId {
-			user = item
-			break
+			return item, err
 		}
 	}
-
-	return user, err
+	return nil, errors.New("User not found")
 }
 
 func NewServerApp(serverRepo domain.ServerRepository) *ServerApp {
