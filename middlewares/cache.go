@@ -18,19 +18,17 @@ type CacheEntry struct {
 var cache *gc.Cache
 
 func init() {
-	cache = gc.New(time.Hour, time.Hour)
+	cache = gc.New(30 * time.Minute, time.Minute)
 }
 
 func CacheAdd(ttl time.Duration) func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		key := utils.CopyString(c.Path())
-		val, found := cache.Get(key)
-
 		if c.Method() != fiber.MethodGet {
 			cache.Delete(key)
-			err := c.Next()
-			return err
+			return c.Next()
 		}
+		val, found := cache.Get(key)
 
 		if found {
 			entry := val.(CacheEntry)
@@ -39,7 +37,6 @@ func CacheAdd(ttl time.Duration) func(*fiber.Ctx) error {
 			c.Response().Header.SetContentTypeBytes(entry.ContentType)
 			return nil
 		}
-		c.Locals("cacheKey", key)
 
 		err := c.Next()
 

@@ -29,12 +29,24 @@ func (app *ServerApp) GetLeaderboard(ServerId string) ([]map[string]interface{},
 
 func (app *ServerApp) GetUserRank(ServerId string, UserId string) (map[string]interface{}, error) {
 	serverRanking, err := app.ServerRepo.GetRanking(ServerId)
-	for _, item := range(serverRanking){
-		if  item["id"] == UserId {
+	for _, item := range serverRanking {
+		if item["id"] == UserId {
 			return item, err
 		}
 	}
 	return nil, errors.New("User not found")
+}
+
+func (app *ServerApp) GetTickets(ServerId string) (map[string]interface{}, error) {
+	tickets, err := app.ServerRepo.GetTickets(ServerId)
+
+	return tickets, err
+}
+
+func (app *ServerApp) EditTickets(ServerId string, tickets map[string]interface{}) error {
+	err := app.ServerRepo.EditTickets(ServerId, tickets)
+
+	return err
 }
 
 func NewServerApp(serverRepo domain.ServerRepository) *ServerApp {

@@ -38,7 +38,7 @@ func GenerateRefreshToken() (string, error) {
 	}
 
 	// Store the refresh token in the cache
-	RefreshCache.Set(token, nil, cache.DefaultExpiration)
+	RefreshCache.Set(token, nil, 20*time.Minute)
 
 	return token, err
 }
