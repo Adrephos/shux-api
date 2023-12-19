@@ -329,7 +329,7 @@ func (h *RouteHandler) Register(c *fiber.Ctx) error {
 		return c.Status(404).JSON(result(false, err, nil))
 	}
 
-	return c.Status(200).JSON(result(true, nil, nil))
+	return h.Login(c)
 }
 
 func (h *RouteHandler) Login(c *fiber.Ctx) error {
@@ -364,6 +364,30 @@ func (h *RouteHandler) Login(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(result(true, nil, data))
+}
+
+func (h *RouteHandler) GetTickets(c *fiber.Ctx) error {
+	tickets, err := h.serverApp.GetTickets(c.Params("server_id"))
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, tickets))
+}
+
+func (h *RouteHandler) EditTickets(c *fiber.Ctx) error {
+	var tickets map[string]interface{}
+	err := json.Unmarshal(c.Body(), &tickets)
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	err = h.serverApp.EditTickets(c.Params("server_id"), tickets)
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	return c.JSON(result(true, nil, map[string]interface{}{
+		"tickets": tickets,
+	}))
 }
 
 func NewRouteHandler(

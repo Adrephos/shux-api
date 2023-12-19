@@ -2,7 +2,9 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"log"
+	"strings"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/iterator"
@@ -70,6 +72,46 @@ func (t *FirestoreServerRepository) GetRanking(ServerId string) ([]map[string]in
 	}
 
 	return userArr, nil
+}
+
+func (t *FirestoreServerRepository) GetTickets(ServerId string) (map[string]interface{}, error) {
+	client := t.Client
+	ctx := context.Background()
+	serverRef := client.Collection("servers").Doc(ServerId)
+	doc, err := serverRef.Get(ctx)
+	ticketsMap := map[string]interface{}{
+		"tickets": make(map[string]interface{}),
+	}
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "not found") {
+			return nil, errors.New("Tickets not found")
+		}
+		return ticketsMap, nil
+	}
+
+	tickets, ok := doc.Data()["tickets"].(map[string]interface{})
+	if !ok {
+		return ticketsMap, nil
+	}
+	ticketsMap["tickets"] = tickets
+
+	return ticketsMap, nil
+}
+
+func (t *FirestoreServerRepository) EditTickets(ServerId string, tickets map[string]interface{}) error {
+	client := t.Client
+	ctx := context.Background()
+	serverRef := client.Collection("servers").Doc(ServerId)
+	_, err := serverRef.Set(ctx, map[string]interface{}{
+		"tickets": tickets,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewFirestoreServerRepo(client *firestore.Client) *FirestoreServerRepository {

@@ -13,4 +13,6 @@ func ServerEndpoints(app *fiber.App, routeHandler *routing.RouteHandler, ttl tim
 
 	route.Get("/servers", middlewares.VerifyToken, routeHandler.ListServers)
 	route.Get("/servers/:server_id/leaderboard", middlewares.VerifyToken, middlewares.CacheAdd(ttl), routeHandler.ServerRanking)
+	route.Get("/servers/:server_id/tickets", middlewares.VerifyToken, routeHandler.GetTickets)
+	route.Post("/servers/:server_id/tickets", middlewares.VerifyToken, routeHandler.EditTickets)
 }
