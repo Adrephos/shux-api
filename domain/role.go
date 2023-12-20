@@ -13,5 +13,6 @@ type (
 		RoleId string `json:"id,omitempty" firestore:"-"`
 		Name   string `json:"name,omitempty" firestore:"name"`
 		Flags  int64  `json:"flags,omitempty" firestore:"flags"`
+		Level  int64  `json:"level,omitempty" firestore:"level"`
 	}
 )
