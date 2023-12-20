@@ -2,6 +2,7 @@
 package middlewares
 
 import (
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,6 +25,7 @@ func init() {
 func CacheAdd(ttl time.Duration) func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		key := utils.CopyString(c.Path())
+		key = strings.TrimRight(key, "/")
 		if c.Method() != fiber.MethodGet {
 			cache.Delete(key)
 			return c.Next()
