@@ -13,7 +13,7 @@ type FirestoreRoleRepository struct {
 }
 
 func (t *FirestoreRoleRepository) List(ServerId string) ([]domain.Role, error) {
-	var roleArr []domain.Role
+	roleArr := make([]domain.Role, 0)
 	path := fmt.Sprintf("servers/%s/roles", ServerId)
 
 	roleMapArr, err := persistance.List(path)

@@ -127,7 +127,7 @@ func Update(path string, data interface{}, id string) error {
 // function to list all documents of a Collection
 func List(path string) ([]map[string]interface{}, error) {
 	ctx := context.Background()
-	var docArr []map[string]interface{}
+	docArr := make([]map[string]interface{}, 0)
 
 	collRef := Client.Collection(path)
 

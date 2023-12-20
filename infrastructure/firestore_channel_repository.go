@@ -13,7 +13,7 @@ type FirestoreChannelRepository struct {
 }
 
 func (t *FirestoreChannelRepository) List(ServerId string) ([]domain.Channel, error) {
-	var channelArr []domain.Channel
+	channelArr := make([]domain.Channel, 0)
 	path := fmt.Sprintf("servers/%s/channels", ServerId)
 
 	channelMapArr, err := persistance.List(path)

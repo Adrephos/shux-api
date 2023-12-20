@@ -17,7 +17,7 @@ type FirestoreServerRepository struct {
 func (t *FirestoreServerRepository) List() ([]string, error) {
 	client := t.Client
 	ctx := context.Background()
-	var idArr []string
+	idArr := make([]string, 0)
 
 	collRef := client.Collection("servers")
 
