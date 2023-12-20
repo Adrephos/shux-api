@@ -10,7 +10,7 @@ type (
 		Create(r *Role, ServerId string) error
 	}
 	Role struct {
-		RoleId string `json:"role_id,omitempty" firestore:"-"`
+		RoleId string `json:"id,omitempty" firestore:"-"`
 		Name   string `json:"name,omitempty" firestore:"name"`
 		Flags  int64  `json:"flags,omitempty" firestore:"flags"`
 	}
