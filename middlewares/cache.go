@@ -2,6 +2,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -27,6 +28,9 @@ func CacheAdd(ttl time.Duration) func(*fiber.Ctx) error {
 		key := utils.CopyString(c.Path())
 		key = strings.TrimRight(key, "/")
 		if c.Method() != fiber.MethodGet {
+			cache.Delete(key)
+			path := strings.Split(key, "/")
+			key = strings.Join(path[:len(path)-1], "/")
 			cache.Delete(key)
 			return c.Next()
 		}
