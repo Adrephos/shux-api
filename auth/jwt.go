@@ -12,11 +12,15 @@ import (
 // Cache for storing refresh tokens
 var RefreshCache = cache.New(20*time.Minute, 30*time.Minute)
 
-func GenerateAccessToken() (string, error) {
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+func newJwt(ttl time.Duration) *jwt.Token {
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(15 * time.Minute).Unix(),
+		"exp": time.Now().Add(ttl).Unix(),
 	})
+}
+
+func GenerateAccessToken() (string, error) {
+	claims := newJwt(15 * time.Minute)
 
 	token, err := claims.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 	if err != nil {
@@ -27,10 +31,7 @@ func GenerateAccessToken() (string, error) {
 }
 
 func GenerateRefreshToken() (string, error) {
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(20 * time.Minute).Unix(),
-	})
+	claims := newJwt(20 * time.Minute)
 
 	token, err := claims.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
 	if err != nil {
@@ -38,7 +39,7 @@ func GenerateRefreshToken() (string, error) {
 	}
 
 	// Store the refresh token in the cache
-	RefreshCache.Set(token, nil, 20*time.Minute)
+	RefreshCache.Add(token, nil, 20*time.Minute)
 
 	return token, err
 }
@@ -52,10 +53,13 @@ func ParseToken(token string) (jwt.MapClaims, error) {
 	return claims, err
 }
 
-func VerifyToken(tokenStr string) (bool, error) {
+func VerifyToken(tokenStr string, refresh bool) (bool, error) {
 	claims := jwt.MapClaims{}
+	secret := os.Getenv("ACCESS_SECRET")
+	if refresh { secret = os.Getenv("REFRESH_SECRET") }
+
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("ACCESS_SECRET")), nil
+		return []byte(secret), nil
 	})
 
 	if err != nil {
