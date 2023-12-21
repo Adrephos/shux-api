@@ -28,6 +28,7 @@ func CacheAdd(ttl time.Duration) func(*fiber.Ctx) error {
 		key = strings.TrimRight(key, "/")
 		if c.Method() != fiber.MethodGet {
 			cache.Delete(key)
+			cache.Delete(key + "/rank")
 			path := strings.Split(key, "/")
 			key = strings.Join(path[:len(path)-1], "/")
 			cache.Delete(key)
