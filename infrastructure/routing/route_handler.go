@@ -2,14 +2,12 @@ package routing
 
 import (
 	"errors"
-
 	"github.com/goccy/go-json"
-	"golang.org/x/crypto/bcrypt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/shuxbot/shux-api/application"
 	"github.com/shuxbot/shux-api/auth"
 	"github.com/shuxbot/shux-api/domain"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type RouteHandler struct {
@@ -31,6 +29,24 @@ func bodyToAdmin(c *fiber.Ctx) (*domain.Admin, error) {
 	}
 
 	return admin, nil
+}
+
+func generateTokens(c *fiber.Ctx) error {
+	accessToken, err := auth.GenerateAccessToken()
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+	refreshToken, err := auth.GenerateRefreshToken()
+	if err != nil {
+		return c.Status(404).JSON(result(false, err, nil))
+	}
+
+	data := map[string]string{
+		"accessToken":  accessToken,
+		"refreshToken": refreshToken,
+	}
+
+	return c.Status(200).JSON(result(true, nil, data))
 }
 
 func hashAndSalt(pwd []byte) string {
@@ -290,29 +306,18 @@ func (h *RouteHandler) RefreshToken(c *fiber.Ctx) error {
 		return c.Status(404).JSON(result(false, err, nil))
 	}
 
+	if valid, _ := auth.VerifyToken(token["token"], true); !valid {
+		return c.Status(404).JSON(result(false, errors.New("Invalid refresh token"), nil))
+	}
+
 	_, found := auth.RefreshCache.Get(token["token"])
 	if !found {
-		return c.Status(404).JSON(result(false, errors.New("Invalid refresh token"), nil))
+		return c.Status(404).JSON(result(false, errors.New("Refresh token already used"), nil))
 	} else {
 		auth.RefreshCache.Delete(token["token"])
 	}
 
-	accessToken, err := auth.GenerateAccessToken()
-	if err != nil {
-		return c.Status(404).JSON(result(false, err, nil))
-	}
-
-	refreshToken, err := auth.GenerateRefreshToken()
-	if err != nil {
-		return c.Status(404).JSON(result(false, err, nil))
-	}
-
-	data := map[string]string{
-		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
-	}
-
-	return c.Status(200).JSON(result(true, nil, data))
+	return generateTokens(c)
 }
 
 func (h *RouteHandler) Register(c *fiber.Ctx) error {
@@ -349,21 +354,7 @@ func (h *RouteHandler) Login(c *fiber.Ctx) error {
 		return c.Status(404).JSON(result(false, errors.New("Incorrect password"), nil))
 	}
 
-	accessToken, err := auth.GenerateAccessToken()
-	if err != nil {
-		return c.Status(404).JSON(result(false, err, nil))
-	}
-	refreshToken, err := auth.GenerateRefreshToken()
-	if err != nil {
-		return c.Status(404).JSON(result(false, err, nil))
-	}
-
-	data := map[string]string{
-		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
-	}
-
-	return c.Status(200).JSON(result(true, nil, data))
+	return generateTokens(c)
 }
 
 func (h *RouteHandler) GetTickets(c *fiber.Ctx) error {

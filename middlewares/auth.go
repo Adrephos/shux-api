@@ -27,7 +27,7 @@ func VerifyToken(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = auth.VerifyToken(token)
+	_, err = auth.VerifyToken(token, false)
 	if err != nil {
 		return err
 	}
