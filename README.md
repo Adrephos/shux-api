@@ -108,7 +108,7 @@ In order for the API to work properly, these enviroment variables need to be set
 ### Local run
 
 > [!NOTE]  
-> To run the API in you machine you need to have [Go installed](https://go.dev/doc/install).
+> To run the API in your machine you need to have [Go installed](https://go.dev/doc/install).
 
 After the enviroment variables are set, you can clone the repository and install the dependencies:
 
