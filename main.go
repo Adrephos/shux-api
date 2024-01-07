@@ -33,7 +33,13 @@ func main() {
 	adminApp := application.NewAdminApp(adminRepo)
 
 	// Initialize route handler
-	routeHandler := routing.NewRouteHandler(userApp, channelApp, roleApp, serverApp, adminApp)
+	routeHandler := routing.NewRouteHandler(
+		userApp,
+		channelApp,
+		roleApp,
+		serverApp,
+		adminApp,
+	)
 
 	app := fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,

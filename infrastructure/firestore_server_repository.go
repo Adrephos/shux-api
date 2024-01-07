@@ -43,7 +43,7 @@ func (t *FirestoreServerRepository) GetRanking(ServerId string) ([]map[string]in
 	client := t.Client
 	ctx := context.Background()
 	usersRef := client.Collection("servers").Doc(ServerId).Collection("users")
-	rankRef := usersRef.OrderBy("points", firestore.Desc)
+	rankRef := usersRef.OrderBy("points", firestore.Desc).Limit(5)
 	var userArr []map[string]interface{}
 
 	iter := rankRef.Documents(ctx)
@@ -72,6 +72,33 @@ func (t *FirestoreServerRepository) GetRanking(ServerId string) ([]map[string]in
 	}
 
 	return userArr, nil
+}
+
+func (t *FirestoreServerRepository) GetUserRank(ServerId string, UserId string) (map[string]interface{}, error) {
+	client := t.Client
+	ctx := context.Background()
+	usersRef := client.Collection("servers").Doc(ServerId).Collection("users")
+	user, err := usersRef.Doc(UserId).Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	userMap := user.Data()
+	points, ok := userMap["points"].(float64)
+	if !ok {
+		points = 0
+	}
+
+	rankRef := usersRef.Where("points", ">", points)
+	rankDocs, err := rankRef.Documents(ctx).GetAll()
+	if err != nil {
+		return nil, err
+	}
+	userRank := make(map[string]interface{})
+	userRank["points"] = userMap["points"]
+	userRank["rank"] = len(rankDocs) + 1
+	userRank["id"] = UserId
+
+	return userRank, nil
 }
 
 func (t *FirestoreServerRepository) GetTickets(ServerId string) (map[string]interface{}, error) {

@@ -24,17 +24,15 @@ func (app *ServerApp) GetLeaderboard(ServerId string) ([]map[string]interface{},
 	if len(serverRanking) < 5 {
 		return nil, errors.New("Not enough users")
 	}
-	return serverRanking[:5], err
+	return serverRanking, err
 }
 
 func (app *ServerApp) GetUserRank(ServerId string, UserId string) (map[string]interface{}, error) {
-	serverRanking, err := app.ServerRepo.GetRanking(ServerId)
-	for _, item := range serverRanking {
-		if item["id"] == UserId {
-			return item, err
-		}
+	userRank, err := app.ServerRepo.GetUserRank(ServerId, UserId)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("User not found")
+	return userRank, err
 }
 
 func (app *ServerApp) GetTickets(ServerId string) (map[string]interface{}, error) {
